@@ -53,10 +53,6 @@ func (c *Client) Dial(url string) {
 	}
 	defer ws.CloseNow()
 
-	// msg, err := json.Marshal(Res{Name: "Sean"})
-	// if err != nil {
-	// 	fmt.Println("failed to marshal")
-	// }
 	err = wsjson.Write(ctx, ws, "Hello from mobile")
 	if err != nil {
 		fmt.Println("failed to send")
@@ -64,29 +60,6 @@ func (c *Client) Dial(url string) {
 
 	ws.Close(websocket.StatusNormalClosure, "")
 }
-
-// func (c *Client) HandleAuth(ws *websocket.Conn) {
-// 	fmt.Println("new incoming connection from client:", ws.RemoteAddr())
-// 	go c.readLoop(ws)
-// 	ws.Write([]byte("Authenticated"))
-// }
-
-// func (c *Client) Dial(endpoint string) {
-// 	cfg, err := websocket.NewConfig(c.ServerAddr+endpoint, c.Origin)
-// 	cfg.Header.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.XbPfbIHMI6arZ3Y922BhjWgQzWXcXNrz0ogtVhfEd2o")
-// 	if err != nil {
-// 		log.Fatal("config error:\n", err)
-// 	}
-// 	ws, err := websocket.DialConfig(cfg)
-// 	if err != nil {
-// 		log.Fatal("connection to client failed:\n", err)
-// 	} else {
-// 		fmt.Printf("connected to socket server %s\n", ws.RemoteAddr())
-// 	}
-// 	go func(ws *websocket.Conn) {
-// 		c.readLoop(ws)
-// 	}(ws)
-// }
 
 // func (c *Client) readLoop(ws *websocket.Conn) {
 // 	buf := make([]byte, 512)

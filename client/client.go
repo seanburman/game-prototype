@@ -6,8 +6,11 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"syscall/js"
+
 	"time"
 
+	"github.com/seanburman/game/config"
 	"nhooyr.io/websocket"
 	"nhooyr.io/websocket/wsjson"
 )
@@ -15,7 +18,7 @@ import (
 type Client struct {
 	Origin     string
 	ServerAddr string
-	Socket     string
+	Conn       *websocket.Conn
 }
 
 type Res struct {
@@ -30,19 +33,6 @@ func NewClient(socket string) *Client {
 	}
 }
 
-func (c *Client) OnPage() {
-	res, err := http.Get("http://127.0.0.1:5500/index.html")
-	if err != nil {
-		log.Fatal(err)
-	}
-	content, err := io.ReadAll(res.Body)
-	res.Body.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(string(content))
-}
-
 func (c *Client) Dial(url string) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
@@ -52,13 +42,64 @@ func (c *Client) Dial(url string) {
 		log.Fatal(err)
 	}
 	defer ws.CloseNow()
+	c.Conn = ws
 
-	err = wsjson.Write(ctx, ws, "Hello from mobile")
+	err = wsjson.Write(ctx, ws, "Hello there")
 	if err != nil {
 		fmt.Println("failed to send")
 	}
 
+	// TODO:  subscribe
 	ws.Close(websocket.StatusNormalClosure, "")
+}
+
+func (c Client) GetHTML() string {
+	u := fmt.Sprintf("%s:5500/index.html", config.Env().HOST)
+	res, err := http.Get(u)
+	if err != nil {
+		log.Fatal(err)
+	}
+	content, err := io.ReadAll(res.Body)
+	fmt.Println(string(content))
+	res.Body.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return string(content)
+}
+
+func (c Client) Handshake() bool {
+	id := js.Global().Call("func")
+	if id.Truthy() {
+		config.Message.Set(fmt.Sprint(id) + "connected to server...")
+		return true
+	}
+	log.Fatal("connection to server failed...")
+	return false
+}
+
+// findConcatByteString searches 'b' for a []byte of provided length following the presence of 's',
+// returning the desired bytes from b[index of s[0] + len(s):index of s[0]+len(s)+length]
+//
+// This is used for parsing codes appended to a shared secret for authentication
+func findConcatByteString(b []byte, s string, length int) ([]byte, bool) {
+	var buf = make([]byte, len(s)+length)
+
+	for _, char := range b {
+		fmt.Println("Handshake buf: ", string(buf))
+		// check if buf contains s
+		if len(buf) == len(s)+length {
+			if string(buf[:len(s)]) == s {
+				// return remainder of buf to length
+				fmt.Println(string(buf))
+				fmt.Println(string(buf[len(s):]))
+				return buf[len(s):], true
+			}
+			buf = buf[1:]
+			buf = append(buf, byte(char))
+		}
+	}
+	return []byte{}, false
 }
 
 // func (c *Client) readLoop(ws *websocket.Conn) {

@@ -8,6 +8,7 @@ require (
 	code.rocketnine.space/tslocum/messeji v1.0.5 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/hajimehoshi/wasmserve v1.0.0 // indirect
+	github.com/siongui/godom v0.0.0-20200920152407-31a6de96fdf6 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	nhooyr.io/websocket v1.8.10 // indirect
 )

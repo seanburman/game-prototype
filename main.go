@@ -1,13 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"image/color"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/seanburman/game/assets"
-	"github.com/seanburman/game/assets/fonts"
 	"github.com/seanburman/game/assets/sprites/box"
 	"github.com/seanburman/game/assets/sprites/square"
 	"github.com/seanburman/game/client"
@@ -16,14 +16,22 @@ import (
 )
 
 var MessageClient *client.Client
-var Input *fonts.TextInput
+
+var Connected = -1
 
 func init() {
 	MessageClient = client.NewClient("/messages")
 	go MessageClient.Dial("/messages")
-	go MessageClient.OnPage()
+	go func() {
+		c := MessageClient.Handshake()
+		fmt.Println(c)
+		if c {
+			Connected = 1
+		} else {
+			Connected = 0
+		}
+	}()
 
-	Input = fonts.NewTextInput(fonts.Roboto)
 	assets.PropRegistry.Register([]assets.SpriteInterface{
 		box.NewBox(50, 50),
 		box.NewBox(150, 150),
@@ -45,16 +53,16 @@ func (g *Game) Update() error {
 	assets.PropRegistry.Update()
 	assets.CharacterRegistry.Update()
 	assets.InputRegistry.Update()
-	Input.Field.Update()
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	screen.Fill(color.RGBA{255, 255, 255, 255})
+	screen.Fill(color.RGBA{0, 0, 0, 0})
+	ebitenutil.DebugPrint(screen, fmt.Sprint("Connection status:  "+fmt.Sprint(Connected)))
+	// screen.Fill(color.RGBA{255, 255, 255, 255})
 	assets.PropRegistry.Draw(screen)
 	assets.CharacterRegistry.Draw(screen)
 	assets.InputRegistry.Draw(screen)
-	Input.Field.Draw(screen)
 	if config.Message != "" {
 		ebitenutil.DebugPrintAt(screen, string(config.Message), 300, 150)
 	}

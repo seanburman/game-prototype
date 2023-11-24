@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"code.rocketnine.space/tslocum/messeji"
+	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/seanburman/game/config"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
@@ -38,6 +39,14 @@ type TextInput struct {
 	Font  Font
 }
 
+func (t *TextInput) Update() {
+	t.Field.Update()
+}
+
+func (t *TextInput) Draw(screen *ebiten.Image) {
+	t.Field.Draw(screen)
+}
+
 func NewTextInput(font Font) *TextInput {
 	ti := TextInput{}
 	ff, err := ti.GetFont(Roboto, 32, 72)
@@ -58,9 +67,9 @@ func (t *TextInput) GetFont(font Font, size float64, dpi float64) (font.Face, er
 	var url string
 	switch font {
 	case Roboto:
-		url = fmt.Sprintf("%s/assets/input/Roboto-Regular.ttf", config.Env().HOST)
+		url = fmt.Sprintf("%s:5500/assets/fonts/Roboto-Regular.ttf", config.Env().HOST)
 	default:
-		url = fmt.Sprintf("%s/assets/input/Roboto-Regular.ttf", config.Env().HOST)
+		url = fmt.Sprintf("%s:5500/assets/fonts/Roboto-Regular.ttf", config.Env().HOST)
 	}
 
 	b, err := LoadFont(url)

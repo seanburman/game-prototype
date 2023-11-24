@@ -10,17 +10,16 @@ debug:
 	ENVIRONMENT=debug
 	go run main.go
 
-serve:
-	go run github.com/hajimehoshi/wasmserve@latest .
-
-build:
+build_debug:
+	cp -f config/env.debug config/env.go
 	env GOOS=js GOARCH=wasm go build -o game.wasm github.com/seanburman/game
 	cp /usr/local/go/misc/wasm/wasm_exec.js .
-build:
+build_dev:
+	cp -f config/env.dev config/env.go
 	env GOOS=js GOARCH=wasm go build -o game.wasm github.com/seanburman/game
 	cp /usr/local/go/misc/wasm/wasm_exec.js .
-build_production:
+build_prod:
+	cp -f config/env.prod config/env.go
 	env GOOS=js GOARCH=wasm go build -o ./build/build-${DATE}/game.wasm github.com/seanburman/game
 	cp /usr/local/go/misc/wasm/wasm_exec.js ./build/build-${DATE}
-	cp main.html ./build/build-${DATE}
 	cp index.html ./build/build-${DATE}

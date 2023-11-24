@@ -1,23 +1,16 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <script>
-            function func(){
-                return "OK"
-            }
-        </script>
-        <style>
-            body {
-                margin: 0
-            }
-            .frame {
-                width: 100vw;
-                height: 100vh;
-                border-width: 0
-            }
-        </style>
-    </head>
-    <body>
-        <iframe src="main.html" class="frame"></iframe>
-    </body>
-</html>
+<script src="wasm_exec.js"></script>
+<script>
+// Polyfill
+if (!WebAssembly.instantiateStreaming) {
+    WebAssembly.instantiateStreaming = async (resp, importObject) => {
+        const source = await (await resp).arrayBuffer();
+        return await WebAssembly.instantiate(source, importObject);
+    };
+}
+
+const go = new Go();
+WebAssembly.instantiateStreaming(fetch("game.wasm"), go.importObject).then(result => {
+    go.run(result.instance);
+});
+</script>

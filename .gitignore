@@ -1,6 +1,6 @@
 .env
+*env*
+config/*env.go*
 .DS_STORE
 build/*
 game.wasm
-*env*
-config/env.go

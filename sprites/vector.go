@@ -1,4 +1,4 @@
-package assets
+package sprites
 
 type XY struct {
 	X, Y int
@@ -6,11 +6,17 @@ type XY struct {
 
 type position XY
 type direction XY
+type velocity int
 
 type Vector struct {
 	p position
 	s int
 	d direction
+	v velocity
+}
+
+func (vc *Vector) Update() {
+	vc.v = 0
 }
 
 func (vc Vector) GetVector() Vector {
@@ -20,8 +26,17 @@ func (vc Vector) GetVector() Vector {
 func (vc Vector) GetSpeed() int {
 	return vc.s
 }
+
 func (vc *Vector) SetSpeed(s int) {
 	vc.s = s
+}
+
+func (vc Vector) GetVelocity() int {
+	return int(vc.v)
+}
+
+func (vc *Vector) SetVelocity(v int) {
+	vc.v = velocity(v)
 }
 
 func (vc Vector) GetPosition() position {

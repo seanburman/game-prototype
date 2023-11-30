@@ -1,4 +1,4 @@
-package assets
+package sprites
 
 import (
 	"image/color"
@@ -33,32 +33,33 @@ type Controls struct {
 	Sprites []*Sprite
 	Touches map[ebiten.TouchID]*Touch
 	Debug   string
-	Collider
-	Vector
-	Name
-	Sprite
+	*Collider
+	*Vector
+	Name string
+	*Sprite
 }
 
 func NewControls(x int, y int) *Controls {
 	c := &Controls{}
+	src := "controls/square1.png"
 	c.Sprites = []*Sprite{
 		NewSprite(c.Button(DPadUp), NewSpriteOpts{
-			ImgSource: "square/img/square1.png",
+			ImgSource: &src,
 		}),
 		NewSprite(c.Button(DPadDown), NewSpriteOpts{
-			ImgSource: "square/img/square1.png",
+			ImgSource: &src,
 		}),
 		NewSprite(c.Button(DPadLeft), NewSpriteOpts{
-			ImgSource: "square/img/square1.png",
+			ImgSource: &src,
 		}),
 		NewSprite(c.Button(DPadRight), NewSpriteOpts{
-			ImgSource: "square/img/square1.png",
+			ImgSource: &src,
 		}),
 		NewSprite(c.Button(ButtonA), NewSpriteOpts{
-			ImgSource: "square/img/square1.png",
+			ImgSource: &src,
 		}),
 		NewSprite(c.Button(ButtonB), NewSpriteOpts{
-			ImgSource: "square/img/square1.png",
+			ImgSource: &src,
 		}),
 	}
 	c.Sprites[DPadUp].SetPosition(x-16, y-60)
@@ -98,13 +99,12 @@ func (c *Controls) Update() {
 			CurrX: x, CurrY: y,
 		}
 
-		char := CharacterRegistry.Sprites[0]
+		char := Registry.Player
 		for _, s := range c.Sprites {
-			n := string(s.GetName())
-			if s.IsPressed(id) && n == c.Button(ButtonB) {
+			if s.IsPressed(id) && s.Name == c.Button(ButtonB) {
 				char.SetSpeed(5)
 			}
-			switch n {
+			switch s.Name {
 			case c.Button(DPadUp):
 				if s.IsPressed(id) && !char.GetBreached().Min.Y {
 					char.Move(0, -1)
@@ -145,6 +145,3 @@ func (c Controls) Button(cb ControllerButton) string {
 		return ""
 	}
 }
-
-func (b *Controls) Move(x int, y int)    {}
-func (b Controls) GetBreached() Breached { return Breached{} }

@@ -11,3 +11,6 @@ dev:
 prod:
 	cp -f config/env.prod config/env.go
 	sudo env GOOS=js GOARCH=wasm go build -o ./build/prod/build-${DATE}/game.wasm github.com/seanburman/game
+
+server:
+	sudo env GOOS=js GOARCH=wasm go build -o ../game-ws-server/static/game.wasm github.com/seanburman/game

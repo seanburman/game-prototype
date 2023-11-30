@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <script src="wasm_exec.js"></script>
 <script>
+    function func(){
+        return "%s"
+    }
+</script>
+<script>
 // Polyfill
 if (!WebAssembly.instantiateStreaming) {
     WebAssembly.instantiateStreaming = async (resp, importObject) => {

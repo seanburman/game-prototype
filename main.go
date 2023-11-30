@@ -1,68 +1,47 @@
 package main
 
 import (
-	"fmt"
 	"image/color"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/seanburman/game/assets"
-	"github.com/seanburman/game/assets/sprites/box"
-	"github.com/seanburman/game/assets/sprites/square"
-	"github.com/seanburman/game/client"
 	"github.com/seanburman/game/config"
 	"github.com/seanburman/game/constants"
+	"github.com/seanburman/game/sprites"
 )
 
-var MessageClient *client.Client
+// var MessageClient *client.Client
 
-var Connected = -1
+// var Connected = -1
 
 func init() {
-	MessageClient = client.NewClient("/messages")
-	go MessageClient.Dial("/messages")
-	go func() {
-		c := MessageClient.Handshake()
-		fmt.Println(c)
-		if c {
-			Connected = 1
-		} else {
-			Connected = 0
-		}
-	}()
-
-	assets.PropRegistry.Register([]assets.SpriteInterface{
-		box.NewBox(50, 50),
-		box.NewBox(150, 150),
-		box.NewBox(150, 225),
-	})
-	assets.CharacterRegistry.Register([]assets.SpriteInterface{
-		square.NewSquare(10, 10),
-	})
-	assets.InputRegistry.Register([]assets.SpriteInterface{
-		assets.NewControls(80, 472),
-	})
+	//TODO: UPDATE MAPGROUNDS BOUNDS, BECAUSE THEY ARE ALWAYS CHANGING
+	// MessageClient = client.NewClient()
+	// // go MessageClient.Dial("/messages")
+	// go func() {
+	// 	c := MessageClient.Handshake()
+	// 	if c {
+	// 		Connected = 1
+	// 	} else {
+	// 		Connected = 0
+	// 	}
+	// }()
 }
 
 type Game struct {
-	bounds assets.Collider
+	bounds sprites.Collider
 }
 
 func (g *Game) Update() error {
-	assets.PropRegistry.Update()
-	assets.CharacterRegistry.Update()
-	assets.InputRegistry.Update()
+	sprites.Registry.Update()
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{0, 0, 0, 0})
-	ebitenutil.DebugPrint(screen, fmt.Sprint("Connection status:  "+fmt.Sprint(Connected)))
-	// screen.Fill(color.RGBA{255, 255, 255, 255})
-	assets.PropRegistry.Draw(screen)
-	assets.CharacterRegistry.Draw(screen)
-	assets.InputRegistry.Draw(screen)
+	// ebitenutil.DebugPrint(screen, fmt.Sprint("Connection status:  "+fmt.Sprint(Connected)))
+	sprites.Registry.Draw(screen)
 	if config.Message != "" {
 		ebitenutil.DebugPrintAt(screen, string(config.Message), 300, 150)
 	}
@@ -76,7 +55,7 @@ func main() {
 	ebiten.SetWindowSize(constants.GetDimensions(), constants.GetDimensions()+500)
 	ebiten.SetWindowTitle("Game")
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
-	if err := ebiten.RunGame(&Game{bounds: config.GAME_BOUNDARIES}); err != nil {
+	if err := ebiten.RunGame(&Game{}); err != nil {
 		log.Fatal(err)
 	}
 }

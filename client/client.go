@@ -26,7 +26,7 @@ type Res struct {
 	Message string
 }
 
-func NewClient(socket string) *Client {
+func NewClient() *Client {
 	return &Client{
 		Origin:     "http://localhost/",
 		ServerAddr: "ws://localhost:3000",
@@ -34,10 +34,11 @@ func NewClient(socket string) *Client {
 }
 
 func (c *Client) Dial(url string) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	ws, _, err := websocket.Dial(ctx, "ws://192.168.1.154:3000/echo", &websocket.DialOptions{})
+	u := fmt.Sprintf("ws://%s%s", config.Env().HOST, url)
+	ws, _, err := websocket.Dial(ctx, u, &websocket.DialOptions{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -70,6 +71,8 @@ func (c Client) GetHTML() string {
 
 func (c Client) Handshake() bool {
 	id := js.Global().Call("func")
+	fmt.Println("WELL THEN")
+	fmt.Printf("%s connected to server...", id)
 	if id.Truthy() {
 		config.Message.Set(fmt.Sprint(id) + "connected to server...")
 		return true
